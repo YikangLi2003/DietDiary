@@ -1,10 +1,10 @@
 package org.example;
 
+import javax.crypto.AEADBadTagException;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
 import java.security.SecureRandom;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.SecretKeyFactory;
@@ -21,20 +21,18 @@ public class AESGCMUtil {
 
     private static final String PBKDF2_ALGORITHM_NAME = "PBKDF2WithHmacSHA256";
     private static final int PBKDF2_SALT_LENGTH = 16;
-    private static final int PBKDF2_ITERATION_COUNT = 65536;
+    private static final int PBKDF2_ITERATION_COUNT = 100000;
 
     /**
      * Generates a random byte array of the specified length.
      * This method is used to generate PBKDF2 salt and AES-GCM nonce.
      *
-     * @param length the length of the byte array
+     * @param length the length of the byte array i.e. number of bytes in the array
      * @return the generated random byte array
      */
     private static byte[] generateRandomBytes(int length) {
         byte[] bytes = new byte[length];
-        SecureRandom secureRandom = new SecureRandom();
-
-        secureRandom.nextBytes(bytes);
+        new SecureRandom().nextBytes(bytes);
 
         return bytes;
     }
@@ -59,13 +57,13 @@ public class AESGCMUtil {
     }
 
     /**
-     * Encrypts the text using AES-GCM with the provided password.
+     * Encrypts your data using AES-GCM with the provided password.
      *
-     * @param text the text to be encrypted
+     * @param plainContent bytes of the data to be encrypted (you need to convert your data structure to bytes)
      * @param password the password
-     * @return the encrypted text
+     * @return the encrypted bytes
      */
-    public static String encrypt(String text, String password) {
+    public static byte[] encrypt(byte[] plainContent, String password) {
         try {
             byte[] salt = generateRandomBytes(PBKDF2_SALT_LENGTH);
             byte[] nonce = generateRandomBytes(AES_NONCE_LENGTH);
@@ -75,16 +73,22 @@ public class AESGCMUtil {
             Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM_NAME);
             GCMParameterSpec parameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, nonce);
             cipher.init(Cipher.ENCRYPT_MODE, key, parameterSpec);
-            byte[] ciphertext = cipher.doFinal(text.getBytes());
+            byte[] encryptedContent = cipher.doFinal(plainContent);
 
-            // Combine salt, nonce, and ciphertext.
-            // combined = salt + nonce + ciphertext
-            byte[] combined = new byte[PBKDF2_SALT_LENGTH + AES_NONCE_LENGTH + ciphertext.length];
+            // Combine salt, nonce, and encrypted content.
+            // combined = salt + nonce + encryptedContent
+            byte[] combined = new byte[PBKDF2_SALT_LENGTH + AES_NONCE_LENGTH + encryptedContent.length];
             System.arraycopy(salt, 0, combined, 0, PBKDF2_SALT_LENGTH);
             System.arraycopy(nonce, 0, combined, PBKDF2_SALT_LENGTH, AES_NONCE_LENGTH);
-            System.arraycopy(ciphertext, 0, combined, PBKDF2_SALT_LENGTH + AES_NONCE_LENGTH, ciphertext.length);
+            System.arraycopy(
+                    encryptedContent,
+                    0,
+                    combined,
+                    PBKDF2_SALT_LENGTH + AES_NONCE_LENGTH,
+                    encryptedContent.length
+            );
 
-            return Base64.getEncoder().encodeToString(combined);
+            return combined;
         } catch (Exception e) {
             throw new RuntimeException("Failed to encrypt text.", e);
         }
@@ -93,51 +97,38 @@ public class AESGCMUtil {
     /**
      * Decrypts the encrypted text using AES-GCM with the provided password.
      *
-     * @param encryptedText the encrypted text
+     * @param encryptedContent the encrypted content to be decrypted with the format salt + nonce + cipher content
      * @param password the password
-     * @return the decrypted text
+     * @return the decrypted bytes (you need to convert it back to your data structure)
      */
-    public static String decrypt(String encryptedText, String password) {
+    public static byte[] decrypt(byte[] encryptedContent, String password) throws AEADBadTagException {
         try {
-            byte[] decodedEncryptedText = Base64.getDecoder().decode(encryptedText);
-
-            // Extract salt, nonce, and ciphertext from the decoded encrypted text.
-            // decodedEncryptedText = salt + nonce + ciphertext
+            // Extract salt, nonce, and content from the encryptedContent.
+            // encryptedContent = salt + nonce + content
             byte[] salt = new byte[PBKDF2_SALT_LENGTH];
             byte[] nonce = new byte[AES_NONCE_LENGTH];
-            byte[] ciphertext = new byte[decodedEncryptedText.length - PBKDF2_SALT_LENGTH - AES_NONCE_LENGTH];
-            System.arraycopy(decodedEncryptedText, 0, salt, 0, PBKDF2_SALT_LENGTH);
-            System.arraycopy(decodedEncryptedText, PBKDF2_SALT_LENGTH, nonce, 0, AES_NONCE_LENGTH);
-            System.arraycopy(decodedEncryptedText, PBKDF2_SALT_LENGTH + AES_NONCE_LENGTH, ciphertext, 0, ciphertext.length);
+            byte[] content = new byte[encryptedContent.length - PBKDF2_SALT_LENGTH - AES_NONCE_LENGTH];
+            System.arraycopy(encryptedContent, 0, salt, 0, PBKDF2_SALT_LENGTH);
+            System.arraycopy(encryptedContent, PBKDF2_SALT_LENGTH, nonce, 0, AES_NONCE_LENGTH);
+            System.arraycopy(
+                    encryptedContent,
+                    PBKDF2_SALT_LENGTH + AES_NONCE_LENGTH,
+                    content,
+                    0,
+                    content.length
+            );
 
-            // Generate the secret key from the password and salt, and decrypt the ciphertext.
+            // Generate the secret key from the password and salt, and decrypt the content.
             SecretKey key = generateKeyFromPassword(password, salt);
             Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM_NAME);
             GCMParameterSpec parameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, nonce);
             cipher.init(Cipher.DECRYPT_MODE, key, parameterSpec);
-            byte[] decryptedText = cipher.doFinal(ciphertext);
 
-            return new String(decryptedText);
+            return cipher.doFinal(content);
+        } catch (AEADBadTagException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to decrypt text.", e);
+            throw new RuntimeException("Failed to decrypt content.", e);
         }
-    }
-
-    public static void main(String[] args) {
-        String text = "Hello world! This is a secret message. If you can read this, you are awesome!"
-        + "Here are a bunch of random characters: !@#$%^&*()_+" +
-                "1234567890-=[]\\;',./`~ This is the end of the message. Even more random characters: {}|:\"<>?";
-        String password = "1a2b3c4d5f";
-
-        System.out.println("Original text: " + text);
-
-        String encryptedText = encrypt(text, password);
-        System.out.println("Encrypted text: " + encryptedText);
-
-        String decryptedText = decrypt(encryptedText, password);
-        System.out.println("Decrypted text: " + decryptedText);
-
-        String failedDecryptedText = decrypt(encryptedText, "wrongpassword");
-        System.out.println("Failed decrypted text: " + failedDecryptedText);
     }
 }
