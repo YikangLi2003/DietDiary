@@ -2,51 +2,59 @@ package org.example;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
 
 public class DatabaseManager {
-    private static Connection connection = null;
-    private static final String URL = "jdbc:sqlite:database.db";
+    public static final String URL = "jdbc:sqlite:DietDiaryApplicationDatabase.db";
 
-    private DatabaseManager() {
-        // private constructor to prevent instantiation
-    }
-
-    public static void connectToDatabase() {
-        if (connection == null) {
-            try {
-                connection = DriverManager.getConnection(URL);
-                connection.createStatement().execute("PRAGMA foreign_keys = ON;");
-                System.out.println("Connection to SQLite has been established.");
-            } catch (SQLException e) {
-                throw new RuntimeException("Failed to connect to the database.", e);
-            }
+    /**
+     * Configure database environment.
+     * Called once when the class is instantiated.
+     * Currently, it only enables foreign key constraints.
+     * Further configurations can be added here.
+     */
+    private static void configureEnvironment() {
+        try (
+                Connection conn = DriverManager.getConnection(URL);
+                Statement stmt = conn.createStatement()
+        ) {
+            stmt.execute("PRAGMA foreign_keys = ON");
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to configure database environment.", e);
         }
     }
 
-    public static void disconnectFromDatabase() {
-        if (connection != null) {
-            try {
-                connection.close();
-                connection = null;
-                System.out.println("Connection to SQLite has been closed.");
-            } catch (SQLException e) {
-                throw new RuntimeException("Failed to close the connection to the database.", e);
-            }
-        }
-    }
+    /**
+     * Creates tables in the database.
+     * Called once when the class is instantiated.
+     */
+    private static void createTables() {
+        String createUsersTable = "CREATE TABLE IF NOT EXISTS users (" +
+                "account TEXT PRIMARY KEY," +
+                "bcrypt_hashed_password TEXT NOT NULL," +
+                "name TEXT NOT NULL," +
+                "signup_time TEXT DEFAULT (datetime('now'))" +
+                ");";
 
-    public static void createTables() {
-        String sql = "CREATE TABLE IF NOT EXISTS tasks (\n"
-                + "    id INTEGER PRIMARY KEY,\n"
-                + "    name TEXT NOT NULL,\n"
-                + "    status TEXT NOT NULL\n"
-                + ");";
-        try {
-            connection.createStatement().execute(sql);
-            System.out.println("Tables has been created.");
+        try (
+                Connection conn = DriverManager.getConnection(URL);
+                Statement stmt = conn.createStatement()
+        ) {
+            stmt.execute(createUsersTable);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to create tables.", e);
         }
+    }
+
+    /**
+     * Initializes the database.
+     * This method should be called once before calling DatabaseAccessor methods.
+     */
+    public static void initializeDatabase() {
+        configureEnvironment();
+        createTables();
     }
 }
