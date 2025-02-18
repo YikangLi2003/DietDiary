@@ -41,7 +41,7 @@ public class DatabaseAccessor {
                 + "account TEXT PRIMARY KEY,"
                 + "hashed_password TEXT NOT NULL,"
                 + "name TEXT NOT NULL,"
-                + "sign_up_time TEXT NOT NULL DEFAULT (datetime('now'))"
+                + "sign_up_time_utc TEXT NOT NULL DEFAULT (datetime('now'))"
                 + ");";
 
         try (
@@ -76,7 +76,7 @@ public class DatabaseAccessor {
     }
 
     public static String showAllUsers() {
-        final String selectAllUsersCommand = "SELECT account, hashed_password, name, sign_up_time FROM users";
+        final String selectAllUsersCommand = "SELECT account, hashed_password, name, sign_up_time_utc FROM users";
         StringBuilder result = new StringBuilder();
 
         try (
@@ -88,7 +88,7 @@ public class DatabaseAccessor {
                 result.append("Account: ").append(rs.getString("account"))
                         .append(", Hashed Password: ").append(rs.getString("hashed_password"))
                         .append(", Name: ").append(rs.getString("name"))
-                        .append(", Sign Up Time: ").append(rs.getString("sign_up_time"))
+                        .append(", Sign Up Time: ").append(rs.getString("sign_up_time_utc"))
                         .append("\n");
             }
         } catch (SQLException e) {
