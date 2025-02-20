@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.database.DatabaseAccessor;
 import org.example.database.exception.*;
+import org.example.utils.PasswordUtils;
 
 public class Main {
     public static void main(String[] args) {
@@ -12,8 +13,8 @@ public class Main {
         DatabaseAccessor.initialize();
 
         try {
-            DatabaseAccessor.addUser("john1988", PasswordUtils.hashPassword("abcd1234"), "John Smith");
-            DatabaseAccessor.addUser("superjoe12", PasswordUtils.hashPassword("supp123"), "Joe Green");
+            DatabaseAccessor.insertUser("john1988", PasswordUtils.hashPassword("abcd1234"), "John Smith");
+            DatabaseAccessor.insertUser("superjoe12", PasswordUtils.hashPassword("supp123"), "Joe Green");
         } catch (DuplicateAccountException e) {
             System.out.println("Duplicate account: " + e.getMessage());
         }
