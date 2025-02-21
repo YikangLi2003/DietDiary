@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 
 import com.github.YikangLi2003.database.exception.DuplicateAccountException;
-import org.example.database.exception.*;
 
 /**
  * This class provides methods to initialize and access the database.
@@ -73,7 +72,7 @@ public class DatabaseAccessor {
                 + "creator_account TEXT NOT NULL,"
                 + "local_creation_time TEXT NOT NULL,"
                 + "is_public INTEGER NOT NULL CHECK(is_public IN (0, 1)),"
-                + "FOREIGN KEY (creator_account) REFERENCES users(account)"
+                + "FOREIGN KEY (creator_account) REFERENCES users(account) ON UPDATE CASCADE"
                 + ");";
 
         final String createNutritionFactsTable = "CREATE TABLE IF NOT EXISTS nutrition_facts ("
@@ -82,7 +81,7 @@ public class DatabaseAccessor {
                 + "average_quantity_per_serving REAL,"
                 + "quantity_unit TEXT,"
                 + "PRIMARY KEY (food_id, nutrient),"
-                + "FOREIGN KEY (food_id) REFERENCES foods(id)"
+                + "FOREIGN KEY (food_id) REFERENCES foods(id) ON DELETE CASCADE"
                 + ");";
 
         final String createLogsTable = "CREATE TABLE IF NOT EXISTS logs ("
@@ -92,7 +91,7 @@ public class DatabaseAccessor {
                 + "local_creation_time TEXT NOT NULL,"
                 + "food_id INTEGER NOT NULL,"
                 + "quantity REAL NOT NULL,"
-                + "FOREIGN KEY (creator_account) REFERENCES users(account),"
+                + "FOREIGN KEY (creator_account) REFERENCES users(account) ON UPDATE CASCADE,"
                 + "FOREIGN KEY (food_id) REFERENCES foods(id)"
                 + ");";
 

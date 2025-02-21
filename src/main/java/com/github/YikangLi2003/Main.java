@@ -2,7 +2,6 @@ package com.github.YikangLi2003;
 
 import com.github.YikangLi2003.database.DatabaseAccessor;
 import com.github.YikangLi2003.database.exception.DuplicateAccountException;
-import org.example.database.exception.*;
 import com.github.YikangLi2003.utils.PasswordUtils;
 
 public class Main {
