@@ -1,4 +1,4 @@
-package org.example.database.exception;
+package com.github.YikangLi2003.database.exception;
 
 public class DuplicateAccountException extends Exception {
     public DuplicateAccountException(String account) {

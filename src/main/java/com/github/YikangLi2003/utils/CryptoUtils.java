@@ -1,4 +1,4 @@
-package org.example.utils;
+package com.github.YikangLi2003.utils;
 
 import javax.crypto.AEADBadTagException;
 import javax.crypto.Cipher;

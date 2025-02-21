@@ -1,4 +1,4 @@
-package org.example.utils;
+package com.github.YikangLi2003.utils;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 

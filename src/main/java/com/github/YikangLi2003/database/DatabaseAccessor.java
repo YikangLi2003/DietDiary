@@ -1,4 +1,4 @@
-package org.example.database;
+package com.github.YikangLi2003.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 
+import com.github.YikangLi2003.database.exception.DuplicateAccountException;
 import org.example.database.exception.*;
 
 /**
@@ -123,7 +124,7 @@ public class DatabaseAccessor {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             if (e.getMessage().contains("UNIQUE constraint failed")) {
-                throw new org.example.database.exception.DuplicateAccountException(account);
+                throw new DuplicateAccountException(account);
             } else {
                 throw new RuntimeException("Failed to add a user to the database.", e);
             }

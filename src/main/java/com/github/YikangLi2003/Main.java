@@ -1,8 +1,9 @@
-package org.example;
+package com.github.YikangLi2003;
 
-import org.example.database.DatabaseAccessor;
+import com.github.YikangLi2003.database.DatabaseAccessor;
+import com.github.YikangLi2003.database.exception.DuplicateAccountException;
 import org.example.database.exception.*;
-import org.example.utils.PasswordUtils;
+import com.github.YikangLi2003.utils.PasswordUtils;
 
 public class Main {
     public static void main(String[] args) {
