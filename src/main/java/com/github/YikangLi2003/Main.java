@@ -2,6 +2,7 @@ package com.github.YikangLi2003;
 
 import com.github.YikangLi2003.database.DatabaseAccessor;
 import com.github.YikangLi2003.database.exception.DuplicateAccountException;
+import com.github.YikangLi2003.database.entity.*;
 import com.github.YikangLi2003.utils.PasswordUtils;
 
 public class Main {
@@ -10,15 +11,9 @@ public class Main {
     }
 
     private static void testDatabaseUsers() {
-        DatabaseAccessor.initialize();
-
-        try {
-            DatabaseAccessor.insertUser("john1988", PasswordUtils.hashPassword("abcd1234"), "John Smith");
-            DatabaseAccessor.insertUser("superjoe12", PasswordUtils.hashPassword("supp123"), "Joe Green");
-        } catch (DuplicateAccountException e) {
-            System.out.println("Duplicate account: " + e.getMessage());
+        User user1 = new User("user1", PasswordUtils.hashPassword("password1"), null, null);
+        if (user1.getName() == null) {
+            System.out.println("User name is null.");
         }
-
-        System.out.println(DatabaseAccessor.showAllUsers());
     }
 }
