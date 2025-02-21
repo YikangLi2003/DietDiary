@@ -1,4 +1,4 @@
-package com.github.YikangLi2003.database;
+package com.github.yikangli2003.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 
-import com.github.YikangLi2003.database.exception.DuplicateAccountException;
+import com.github.yikangli2003.database.exception.DuplicateAccountException;
 
 /**
  * This class provides methods to initialize and access the database.

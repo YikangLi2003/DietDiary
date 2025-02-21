@@ -1,4 +1,4 @@
-package com.github.YikangLi2003.utils;
+package com.github.yikangli2003.utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

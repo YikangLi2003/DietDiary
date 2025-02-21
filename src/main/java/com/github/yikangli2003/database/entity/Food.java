@@ -1,9 +1,8 @@
-package com.github.YikangLi2003.database.entity;
+package com.github.yikangli2003.database.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import org.springframework.lang.NonNull;
 
 @Entity
 public class Food {

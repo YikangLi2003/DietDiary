@@ -1,4 +1,4 @@
-package com.github.YikangLi2003.objectdbtest;
+package com.github.yikangli2003.objectdbtest;
 
 import jakarta.persistence.*;
 import java.util.List;

@@ -1,9 +1,7 @@
-package com.github.YikangLi2003;
+package com.github.yikangli2003;
 
-import com.github.YikangLi2003.database.DatabaseAccessor;
-import com.github.YikangLi2003.database.exception.DuplicateAccountException;
-import com.github.YikangLi2003.database.entity.*;
-import com.github.YikangLi2003.utils.PasswordUtils;
+import com.github.yikangli2003.database.entity.*;
+import com.github.yikangli2003.utils.PasswordUtils;
 
 public class Main {
     public static void main(String[] args) {

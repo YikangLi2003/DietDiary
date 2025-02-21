@@ -1,4 +1,4 @@
-package com.github.YikangLi2003.database.entity;
+package com.github.yikangli2003.database.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -64,7 +64,6 @@ public class User {
     public List<Food> getFoods() {
         return foods;
     }
-
 
     public void setFoods(List<Food> foods) {
         this.foods = foods;
