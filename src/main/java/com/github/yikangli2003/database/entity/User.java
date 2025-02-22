@@ -1,10 +1,6 @@
 package com.github.yikangli2003.database.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,17 +10,17 @@ public class User {
     @Id
     private String account;
 
-    @NotNull
+    @Column(nullable = false)
     private String hashedPassword;
 
-    @NotNull
+    @Column(nullable = false)
     private String name;
 
-    @NotNull
-    private final LocalDateTime localRegistrationTime;
+    @Column(nullable = false)
+    private LocalDateTime localRegistrationTime;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<@NotNull Food> foods;
+    @OneToMany(mappedBy = "uploader")
+    private List<Food> uploadedFoods;
 
     public User(String account, String hashedPassword, String name, LocalDateTime localRegistrationTime) {
         this.account = account;
@@ -32,6 +28,7 @@ public class User {
         this.name = name;
         this.localRegistrationTime = localRegistrationTime;
     }
+
 
     public String getAccount() {
         return account;
@@ -61,24 +58,11 @@ public class User {
         return localRegistrationTime;
     }
 
-    public List<Food> getFoods() {
-        return foods;
+    public List<Food> getUploadedFoods() {
+        return uploadedFoods;
     }
 
-    public void setFoods(List<Food> foods) {
-        this.foods = foods;
-        for (Food food : foods) {
-            food.setUser(this);
-        }
-    }
-
-    public void setFood(Food food) {
-        foods.add(food);
-        food.setUser(this);
-    }
-
-    public void removeFood(Food food) {
-        foods.remove(food);
-        food.setUser(null);
+    public void storeUploadedFood(Food food) {
+        uploadedFoods.add(food);
     }
 }
