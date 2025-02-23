@@ -1,4 +1,4 @@
-package com.github.yikangli2003.utils;
+package com.github.yikangli2003.util;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * BCrypt password hashing and check utility.
  * This class will assist in users' password management.
  */
-public class PasswordUtils {
+public class PasswordUtil {
     // Alter the strength of encoder to increase or decrease the time taken to hash the password.
     private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 

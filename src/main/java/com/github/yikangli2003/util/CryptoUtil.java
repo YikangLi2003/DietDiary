@@ -1,4 +1,4 @@
-package com.github.yikangli2003.utils;
+package com.github.yikangli2003.util;
 
 import javax.crypto.AEADBadTagException;
 import javax.crypto.Cipher;
@@ -11,7 +11,7 @@ import java.security.MessageDigest;
 /**
  * This class provides utility methods for encrypting and decrypting data using no-padding AES-GCM algorithm.
  */
-public class CryptoUtils {
+public class CryptoUtil {
     private static final String AES_GCM_ALGORITHM_NAME = "AES/GCM/NoPadding";
     private static final String AES_ALGORITHM_NAME = "AES";
     private static final String SHA_ALGORITHM_NAME = "SHA-256";
@@ -48,8 +48,8 @@ public class CryptoUtils {
             new SecureRandom().nextBytes(iv);
 
             SecretKey key = generateKeyFromPassword(password);
-            Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM_NAME);
             GCMParameterSpec parameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+            Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM_NAME);
             cipher.init(Cipher.ENCRYPT_MODE, key, parameterSpec);
             byte[] encryptedData = cipher.doFinal(plainData);
 
@@ -80,8 +80,8 @@ public class CryptoUtils {
             System.arraycopy(encryptedDataWithIV, AES_IV_LENGTH, encryptedData, 0, encryptedData.length);
 
             SecretKey key = generateKeyFromPassword(password);
-            Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM_NAME);
             GCMParameterSpec parameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+            Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM_NAME);
             cipher.init(Cipher.DECRYPT_MODE, key, parameterSpec);
 
             return cipher.doFinal(encryptedData);
