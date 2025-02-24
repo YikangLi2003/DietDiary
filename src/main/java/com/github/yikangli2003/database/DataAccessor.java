@@ -63,6 +63,28 @@ public class DataAccessor {
         }
     }
 
+    public static void changeUserPassword(String account, String newHashedPassword) throws UserNotFoundException {
+        executeInTransaction(entityManager -> {
+            User user = entityManager.find(User.class, account);
+            if (user != null) {
+                user.setHashedPassword(newHashedPassword);
+            } else {
+                throw new UserNotFoundException(account);
+            }
+        });
+    }
+
+    public static User getUserByAccount(String account) throws UserNotFoundException {
+        return executeInTransaction(entityManager -> {
+            User user = entityManager.find(User.class, account);
+            if (user != null) {
+                return user;
+            } else {
+                throw new UserNotFoundException(account);
+            }
+        });
+    }
+
     public static List<User> getAllUsers() {
         return executeInTransaction(entityManager -> {
             return entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
