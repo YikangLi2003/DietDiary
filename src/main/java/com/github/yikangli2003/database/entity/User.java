@@ -1,9 +1,7 @@
 package com.github.yikangli2003.database.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+import jakarta.persistence.GenerationType.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +9,11 @@ import java.util.List;
 @Entity
 public class User {
     @Id
-    private String account;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private String id;
+
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @Column(nullable = false)
     private String hashedPassword;
@@ -25,21 +27,20 @@ public class User {
     @OneToMany(mappedBy = "uploader")
     private List<Food> uploadedFoods;
 
-    public User(String account, String hashedPassword, String name, LocalDateTime localRegistrationTime) {
-        this.account = account;
+    public User(String email, String hashedPassword, String name, LocalDateTime localRegistrationTime) {
+        this.email = email;
         this.hashedPassword = hashedPassword;
         this.name = name;
         this.localRegistrationTime = localRegistrationTime;
     }
 
+    public String getId() { return id; }
 
-    public String getAccount() {
-        return account;
+    public String getEmail() {
+        return email;
     }
 
-    public void setAccount(String account) {
-        this.account = account;
-    }
+    public void setEmail(String account) { this.email = email; }
 
     public String getHashedPassword() {
         return hashedPassword;
@@ -63,9 +64,5 @@ public class User {
 
     public List<Food> getUploadedFoods() {
         return uploadedFoods;
-    }
-
-    public void storeUploadedFood(Food food) {
-        uploadedFoods.add(food);
     }
 }

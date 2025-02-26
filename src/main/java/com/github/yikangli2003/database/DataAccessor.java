@@ -45,31 +45,38 @@ public class DataAccessor {
         }
     }
 
+    // User entity related methods performing CURD operations.
+
     public static void signUpNewUser (
-            String account,
+            String email,
             String hashedPassword,
             String name,
             LocalDateTime localRegistrationTime
-    ) throws DuplicatedUserAccountException {
-        try {
-            executeInTransaction(entityManager -> {
-                User newUser = new User(account, hashedPassword, name, localRegistrationTime);
-                entityManager.persist(newUser);
-            });
-        } catch (RollbackException e) {
-            if (e.getCause() instanceof EntityExistsException) {
-                throw new DuplicatedUserAccountException(account, e);
-            }
-        }
+    ) {
+        executeInTransaction(entityManager -> {
+            User newUser = new User(email, hashedPassword, name, localRegistrationTime);
+            entityManager.persist(newUser);
+        });
     }
 
-    public static void changeUserPassword(String account, String newHashedPassword) throws UserNotFoundException {
+    public static void changeUserPassword(String targetAccount, String newHashedPassword) throws UserNotFoundException {
         executeInTransaction(entityManager -> {
-            User user = entityManager.find(User.class, account);
+            User user = entityManager.find(User.class, targetAccount);
             if (user != null) {
                 user.setHashedPassword(newHashedPassword);
             } else {
-                throw new UserNotFoundException(account);
+                throw new UserNotFoundException(targetAccount);
+            }
+        });
+    }
+
+    public static void changeUserName(String targetAccount, String newUsername) throws UserNotFoundException {
+        executeInTransaction(entityManager -> {
+            User user = entityManager.find(User.class, targetAccount);
+            if (user != null) {
+                user.setName(newUsername);
+            } else {
+                throw new UserNotFoundException(targetAccount);
             }
         });
     }
@@ -82,12 +89,6 @@ public class DataAccessor {
             } else {
                 throw new UserNotFoundException(account);
             }
-        });
-    }
-
-    public static List<User> getAllUsers() {
-        return executeInTransaction(entityManager -> {
-            return entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
         });
     }
 }

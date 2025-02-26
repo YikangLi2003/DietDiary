@@ -24,6 +24,7 @@ public class Main {
                 LocalDateTime.now()
         );*/
 
+        /*
         try {
             User user = DataAccessor.getUserByAccount("user1");
             System.out.println("Find user " + user.getName() + ".");
@@ -56,8 +57,13 @@ public class Main {
         } else if (PasswordUtil.checkPassword("18273", user.getHashedPassword())) {
             System.out.println(user.getName() + " has password 18273 and hasded as " + user.getHashedPassword());
         }
+        */
 
-
+        DataAccessor.signUpNewUser(
+                "giao@email.com",
+                PasswordUtil.hashPassword("12345"),
+                "Giao Giao",
+                LocalDateTime.now());
 
         DataAccessor.closeEntityManagerFactory();
     }
