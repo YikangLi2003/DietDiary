@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @Entity
 public class Food {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @ManyToOne
     private User uploader;
@@ -54,7 +54,7 @@ public class Food {
         this.localUploadTime = localUploadTime;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 

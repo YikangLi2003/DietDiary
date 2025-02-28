@@ -7,13 +7,12 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.RollbackException;
-import jakarta.persistence.EntityExistsException;
 
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.List;
 
 public class DataAccessor {
     private static final EntityManagerFactory entityManagerFactory =
@@ -48,47 +47,41 @@ public class DataAccessor {
     // User entity related methods performing CURD operations.
 
     public static void signUpNewUser (
-            String email,
+            String account,
             String hashedPassword,
             String name,
             LocalDateTime localRegistrationTime
-    ) {
-        executeInTransaction(entityManager -> {
-            User newUser = new User(email, hashedPassword, name, localRegistrationTime);
-            entityManager.persist(newUser);
-        });
+    ) throws DuplicatedEntityPropertyException {
+        try {
+            executeInTransaction(entityManager -> {
+                User newUser = new User(account, hashedPassword, name, localRegistrationTime);
+                entityManager.persist(newUser);
+            });
+        } catch (RollbackException e) {
+            throw new DuplicatedEntityPropertyException("User", "account", account, e);
+        }
     }
 
-    public static void changeUserPassword(String targetAccount, String newHashedPassword) throws UserNotFoundException {
-        executeInTransaction(entityManager -> {
-            User user = entityManager.find(User.class, targetAccount);
-            if (user != null) {
-                user.setHashedPassword(newHashedPassword);
-            } else {
-                throw new UserNotFoundException(targetAccount);
-            }
-        });
-    }
-
-    public static void changeUserName(String targetAccount, String newUsername) throws UserNotFoundException {
-        executeInTransaction(entityManager -> {
-            User user = entityManager.find(User.class, targetAccount);
-            if (user != null) {
-                user.setName(newUsername);
-            } else {
-                throw new UserNotFoundException(targetAccount);
-            }
-        });
-    }
-
-    public static User getUserByAccount(String account) throws UserNotFoundException {
+    public static User getUserByAccount(String account) throws EntityNotFoundException {
         return executeInTransaction(entityManager -> {
-            User user = entityManager.find(User.class, account);
-            if (user != null) {
-                return user;
+            String jpql = "SELECT u FROM User u WHERE u.account = :account";
+            TypedQuery<User> query = entityManager.createQuery(jpql, User.class);
+            query.setParameter("account", account);
+
+            if (query.getResultList().isEmpty()) {
+                throw new EntityNotFoundException("User", "account", account);
             } else {
-                throw new UserNotFoundException(account);
+                return query.getResultList().getFirst();
             }
+        });
+    }
+
+    public static void saveUserPropertyChange(User updatedUser) throws EntityNotFoundException {
+        executeInTransaction(entityManager -> {
+            if (updatedUser.getId() == null || entityManager.find(User.class, updatedUser.getId()) == null) {
+                throw new EntityNotFoundException("User", "id", String.valueOf(updatedUser.getId()));
+            }
+            entityManager.merge(updatedUser);
         });
     }
 }
